@@ -296,6 +296,5 @@ __pycache__/
 *.xsd.cs
 
 
-!.vscode/arduino.json
-!arduino/**/*
+!arduino/*
 ssipf-arduino-dum.code-workspace

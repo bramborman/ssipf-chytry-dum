@@ -1,5 +1,0 @@
-{
-    "sketch": "src\\0_prizemi_dvoje_dvere\\test_motor_OK\\test_motor_OK.ino",
-    "board": "arduino:avr:uno",
-    "programmer": "AVRISP mkII"
-}

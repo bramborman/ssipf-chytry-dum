@@ -3,7 +3,6 @@
 set directorypath=%~dp0%
 set directorypath=%directorypath:\=\\%
 
-set arduinopath=%directorypath%arduino
 set filepath=%directorypath%ssipf-arduino-dum.code-workspace
 
 if not exist %filepath% (
@@ -15,8 +14,18 @@ if not exist %filepath% (
         echo        }
         echo    ],
         echo    "settings": {
-        echo        "arduino.path": "%arduinopath%"
+        echo        "arduino.path": "%directorypath%arduino"
         echo    }
+        echo }
+    ) > %filepath%
+)
+
+set filepath=%directorypath%.vscode\\arduino.json
+
+if not exist %filepath% (
+    (
+        echo {
+        echo    "programmer": "AVRISP mkII"
         echo }
     ) > %filepath%
 )
