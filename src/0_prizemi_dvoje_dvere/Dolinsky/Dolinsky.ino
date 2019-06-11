@@ -1,15 +1,14 @@
-#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <Servo.h>
+#include <Wire.h>
 
 // Definice pinů
-#define OUT_VSTUP_SERVO 9
-#define OUT_LED_ZEL_SIG 12
-#define OUT_LED_SVETLA 10
+#define IN_PRIZEMI_VSTUP_CIDLO 5
+#define OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL 12
+#define OUT_PRIZEMI_VSTUP_SERVO 9
+#define OUT_PRIZEMI_LED_SVETLA 10
 #define OUT_JUST_ANOTHER_ZEM 11
 #define OUT_P_TRIG 4
-#define IN_P_ECHO 5
-// Čísla pinů pro krokový zahradní motor
 #define OUT_ZAHRADA_MOTOR_1 8
 #define OUT_ZAHRADA_MOTOR_2 11
 #define OUT_ZAHRADA_MOTOR_3 13
@@ -18,41 +17,38 @@
 
 // Konstanta pro nastavení rychlosti,
 // se zvětšujícím se číslem se rychlost zmenšuje
-#define ZAHRADA_RYCHLOST 1
-#define ZAHRADA_UHEL 360
+#define ZAHRADA_KROK_PAUZA 1
 #define ZAHRADA_KROKY_POCET 8
+#define ZAHRADA_KROKY_ZAVRENI_POCET 13000
 
-bool vstup_otevreno = false;
 Servo vstup_servo;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup() {
-  // Inicializace výstupů k zahradnímu motoru
+  // Inicializace pinů
+  pinMode(IN_PRIZEMI_VSTUP_CIDLO, INPUT);
+  pinMode(OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL, OUTPUT);
+  pinMode(OUT_PRIZEMI_LED_SVETLA, OUTPUT);
+  pinMode(OUT_JUST_ANOTHER_ZEM, OUTPUT);
+  pinMode(OUT_P_TRIG, OUTPUT);
   pinMode(OUT_ZAHRADA_MOTOR_1, OUTPUT);
   pinMode(OUT_ZAHRADA_MOTOR_2, OUTPUT);
   pinMode(OUT_ZAHRADA_MOTOR_3, OUTPUT);
   pinMode(OUT_ZAHRADA_MOTOR_4, OUTPUT);
-  // Inicializace vstupu od dorazu zahradních dveří
   pinMode(IN_ZAHRADA_DORAZ, INPUT);
-  pinMode(OUT_P_TRIG, OUTPUT);
-  pinMode(IN_P_ECHO, INPUT);
-  pinMode(OUT_LED_ZEL_SIG, OUTPUT);
-  pinMode(OUT_LED_SVETLA, OUTPUT);
-  pinMode(OUT_JUST_ANOTHER_ZEM, OUTPUT);
-
-  zahrada_inicializaceDveri();
 
   lcd.begin();
   lcd.backlight();
-  lcd.print("   SS IPF Brno ");
-  lcd.setCursor(3, 1);
-  lcd.print("Vitame te!!!");
+  lcd.setCursor(3, 0);
+  lcd.print("Zapinam se");
 
-  digitalWrite(OUT_LED_ZEL_SIG, LOW);
-  digitalWrite(OUT_LED_SVETLA, LOW);
+  zahrada_otevrit();
+  zahrada_zavrit();
+  displej_uvitaciHlaska();
+
+  digitalWrite(OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL, LOW);
+  digitalWrite(OUT_PRIZEMI_LED_SVETLA, LOW);
   digitalWrite(OUT_JUST_ANOTHER_ZEM, LOW);
-
-  Serial.begin(9600);
 }
 
 void loop() {
@@ -62,65 +58,65 @@ void loop() {
   delayMicroseconds(5);
   digitalWrite(OUT_P_TRIG, LOW);
 
-  long odezva = pulseIn(IN_P_ECHO, HIGH);
+  long odezva = pulseIn(IN_PRIZEMI_VSTUP_CIDLO, HIGH);
   long vzdalenost = odezva / 58.31;
-
-  Serial.print("Vzdalenost je ");
-  Serial.print(vzdalenost);
-  Serial.println(" cm.");
+  // Serial.print("Vzdalenost je ");
+  // Serial.print(vzdalenost);
+  // Serial.println(" cm.");
 
   if (vzdalenost < 25) {
-    vstup_otevrit();
-  }
+    digitalWrite(OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL, HIGH);
 
-  if (vstup_otevreno) {
-    vstup_zavrit();
     lcd.clear();
+    lcd.setCursor(1, 0);
+    lcd.print("Oteviram dvere");
+    vstup_otevrit();
+
+    lcd.setCursor(1, 1);
+    lcd.print("Zapinam svetla");
+    digitalWrite(OUT_PRIZEMI_LED_SVETLA, HIGH);
+
+    zahrada_otevrit();
+    
+    delay(5500);
+
+    lcd.clear();
+    lcd.setCursor(4, 0);
+    lcd.print("Zhasinam");
+    digitalWrite(OUT_PRIZEMI_LED_SVETLA, LOW);
+    
+    lcd.setCursor(1, 1);
+    lcd.print("Zaviram dvere");
+    digitalWrite(OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL, LOW);
+    vstup_zavrit();
+
+    zahrada_zavrit();
+    
+    displej_uvitaciHlaska();
   }
+}
 
-  lcd.setCursor(1, 0);
-  lcd.print(" SS IPF Brno   ");
-  lcd.setCursor(1, 1);
-  lcd.print(" Vitame te!!!     ");
-
-  zahrada_otevrit();
-  delay(5000);
-  zahrada_zavrit();
+void displej_uvitaciHlaska() {
+  lcd.clear();
+  lcd.setCursor(3, 0);
+  lcd.print("SSIPF Brno");
+  lcd.setCursor(2, 1);
+  lcd.print("Vitame te!!!");
 }
 
 void vstup_otevrit() {
-  digitalWrite(OUT_LED_ZEL_SIG, HIGH);
+  vstup_servo.attach(OUT_PRIZEMI_VSTUP_SERVO);
 
-  lcd.clear();
-  lcd.setCursor(1, 0);
-  lcd.print("Oteviram dvere.");
-  lcd.setCursor(1, 1);
-  lcd.print("Zapinam svetla.");
-
-  vstup_servo.attach(OUT_VSTUP_SERVO);
-
-  for (int pos = 85; pos >= 0; pos -= 1) {
+  for (int pos = 85; pos >= 0; pos--) {
     vstup_servo.write(pos);
     delay(10);
   }
 
   vstup_servo.detach();
-  delay(5500);
-
-  vstup_otevreno = true;
-
-  digitalWrite(OUT_LED_ZEL_SIG, LOW);
 }
 
 void vstup_zavrit() {
-  digitalWrite(OUT_LED_SVETLA, HIGH);
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Zaviram dvere!    ");
-  lcd.setCursor(0, 1);
-  lcd.print("Zhasinam.         ");
-
-  vstup_servo.attach(OUT_VSTUP_SERVO);
+  vstup_servo.attach(OUT_PRIZEMI_VSTUP_SERVO);
 
   for (int pos = 0; pos < 140; pos++) {
     vstup_servo.write(pos);
@@ -128,48 +124,37 @@ void vstup_zavrit() {
   }
 
   vstup_servo.detach();
-  vstup_otevreno = false;
-  delay(2000);
-  digitalWrite(OUT_LED_SVETLA, LOW);
 }
 
-// Plná rotace zahradního motoru o 360 stupňů = 512 volání
-// Funkce Otevri() či Zavri()
-void zahrada_inicializaceDveri() {
-  // Nastavení výchozí polohy
-  //   1) úplné otevření na doraz
-  //   2) zavření
-  int doraz = digitalRead(IN_ZAHRADA_DORAZ);
-
-  // Otevírej
-  while (doraz == 1) {
-    for (int i = 0; i < ZAHRADA_KROKY_POCET; i++) {
-      zahrada_krok(i);
-      doraz = digitalRead(IN_ZAHRADA_DORAZ);
-    }
-  }
-
-  // 2 * plná rotace o 360 stupňů = 2 * 512 volání
-  zahrada_zavrit();
-  zahrada_zavrit();
-}
-
-// Funkce pro volání jednotlivých
-// kroků pro otočení po či proti směru hodinových
-// ručiček pro zahradní motor
 void zahrada_otevrit() {
-  for (int i = 0; i < (ZAHRADA_UHEL * 64 / 45); i++) {
-    for (int i = 0; i < ZAHRADA_KROKY_POCET; i++) {
-      zahrada_krok(i);
+  int doraz = digitalRead(IN_ZAHRADA_DORAZ);
+  int krok = 0;
+
+  while (doraz == HIGH) {
+    zahrada_krok(krok);
+    krok++;
+
+    if (krok == ZAHRADA_KROKY_POCET) {
+      krok = 0;
     }
+
+    doraz = digitalRead(IN_ZAHRADA_DORAZ);
   }
 }
 
 void zahrada_zavrit() {
-  for (int i = 0; i < (ZAHRADA_UHEL * 64 / 45); i++) {
-    for (int i = ZAHRADA_KROKY_POCET - 1; i >= 0; i--) {
-      zahrada_krok(i);
+  int krok = ZAHRADA_KROKY_POCET - 1;
+  int krokyCelkem = 0;
+
+  while (krokyCelkem != ZAHRADA_KROKY_ZAVRENI_POCET) {
+    zahrada_krok(krok);
+    krok--;
+
+    if (krok == -1) {
+      krok = ZAHRADA_KROKY_POCET - 1;
     }
+
+    krokyCelkem++;
   }
 }
 
@@ -181,14 +166,14 @@ void zahrada_krok(int krok) {
   // uložena v paměti i po opuštení funkce
   // a nebude se vytvářet při každém volání funkce
   static const int ZAHRADA_KROKY[ZAHRADA_KROKY_POCET][4] = {
-      {HIGH, LOW, LOW, LOW},  // 1
-      {HIGH, HIGH, LOW, LOW}, // 2
-      {LOW, HIGH, LOW, LOW},  // 3
-      {LOW, HIGH, HIGH, LOW}, // 4
-      {LOW, LOW, HIGH, LOW},  // 5
-      {LOW, LOW, HIGH, HIGH}, // 6
-      {LOW, LOW, LOW, HIGH},  // 7
-      {HIGH, LOW, LOW, HIGH}  // 8
+      {HIGH,  LOW,  LOW,  LOW},
+      {HIGH, HIGH,  LOW,  LOW},
+      { LOW, HIGH,  LOW,  LOW},
+      { LOW, HIGH, HIGH,  LOW},
+      { LOW,  LOW, HIGH,  LOW},
+      { LOW,  LOW, HIGH, HIGH},
+      { LOW,  LOW,  LOW, HIGH},
+      {HIGH,  LOW,  LOW, HIGH}
   };
 
   const int *HODNOTY = ZAHRADA_KROKY[krok];
@@ -197,5 +182,5 @@ void zahrada_krok(int krok) {
   digitalWrite(OUT_ZAHRADA_MOTOR_3, HODNOTY[2]);
   digitalWrite(OUT_ZAHRADA_MOTOR_4, HODNOTY[3]);
 
-  delay(ZAHRADA_RYCHLOST);
+  delay(ZAHRADA_KROK_PAUZA);
 }
