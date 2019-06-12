@@ -297,7 +297,8 @@ __pycache__/
 
 
 !arduino/*
+arduino/portable/library_index.json
 arduino/portable/package_index.json
 arduino/portable/package_index.json.sig
 arduino/portable/preferences.txt
-ssipf-arduino-dum.code-workspace
+ssipf-chytry-dum.code-workspace

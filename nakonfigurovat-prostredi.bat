@@ -3,7 +3,7 @@
 set directorypath=%~dp0%
 set directorypath=%directorypath:\=\\%
 
-set filepath=%directorypath%ssipf-arduino-dum.code-workspace
+set filepath=%directorypath%ssipf-chytry-dum.code-workspace
 
 if not exist %filepath% (
     (

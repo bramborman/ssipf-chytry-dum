@@ -4,10 +4,7 @@
 
 	// List of extensions which should be recommended for users of this workspace.
 	"recommendations": [
-		"vsciot-vscode.vscode-arduino",
-		"ms-vscode.cpptools",
-		"ronaldosena.arduino-snippets",
-		"aaron-bond.better-comments"
+		"vsciot-vscode.vscode-arduino"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [
