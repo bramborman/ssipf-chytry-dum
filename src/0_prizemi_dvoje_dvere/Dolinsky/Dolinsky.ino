@@ -2,6 +2,11 @@
 #include <Servo.h>
 #include <Wire.h>
 
+// Odkomentujte následující řádek
+// pro zapnutí vypisování zpráv
+// do sériového monitoru
+// #define SERIAL_DEBUG
+
 // Definice pinů
 #define IN_PRIZEMI_VSTUP_CIDLO 5
 #define OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL 12
@@ -49,6 +54,10 @@ void setup() {
   digitalWrite(OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL, LOW);
   digitalWrite(OUT_PRIZEMI_LED_SVETLA, LOW);
   digitalWrite(OUT_JUST_ANOTHER_ZEM, LOW);
+
+#ifdef SERIAL_DEBUG
+  Serial.begin(9600);
+#endif
 }
 
 void loop() {
@@ -60,9 +69,12 @@ void loop() {
 
   long odezva = pulseIn(IN_PRIZEMI_VSTUP_CIDLO, HIGH);
   long vzdalenost = odezva / 58.31;
-  // Serial.print("Vzdalenost je ");
-  // Serial.print(vzdalenost);
-  // Serial.println(" cm.");
+
+#ifdef SERIAL_DEBUG
+  Serial.print("Vzdalenost je ");
+  Serial.print(vzdalenost);
+  Serial.println(" cm.");
+#endif
 
   if (vzdalenost < 25) {
     digitalWrite(OUT_PRIZEMI_VSTUP_LED_ZELENY_SIGNAL, HIGH);
