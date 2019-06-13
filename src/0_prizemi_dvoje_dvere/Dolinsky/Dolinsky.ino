@@ -3,8 +3,8 @@
 #include <Wire.h>
 
 // Odkomentujte následující řádek
-// pro zapnutí vypisování zpráv
-// do sériového monitoru
+// pro zapnutí vypisování testovacích
+// zpráv do sériového monitoru
 // #define SERIAL_DEBUG
 
 // Definice pinů
@@ -67,8 +67,8 @@ void loop() {
   delayMicroseconds(5);
   digitalWrite(OUT_P_TRIG, LOW);
 
-  long odezva = pulseIn(IN_PRIZEMI_VSTUP_CIDLO, HIGH);
-  long vzdalenost = odezva / 58.31;
+  const long odezva = pulseIn(IN_PRIZEMI_VSTUP_CIDLO, HIGH);
+  const long vzdalenost = odezva / 58.31;
 
 #ifdef SERIAL_DEBUG
   Serial.print("Vzdalenost je ");
@@ -170,14 +170,14 @@ void zahrada_zavrit() {
   }
 }
 
-void zahrada_krok(int krok) {
+void zahrada_krok(const int krok) {
   // Každý krok obsahuje výrobcem dané pořadí
   // pro správné spínání motoru(zahradního) a následnou
   // pauzu, kterou určujeme rychlost otáčení
   // Klíčové slovo static zajistí, že bude proměnná
   // uložena v paměti i po opuštení funkce
   // a nebude se vytvářet při každém volání funkce
-  static const int ZAHRADA_KROKY[ZAHRADA_KROKY_POCET][4] = {
+  static const int zahradaKroky[ZAHRADA_KROKY_POCET][4] = {
       {HIGH,  LOW,  LOW,  LOW},
       {HIGH, HIGH,  LOW,  LOW},
       { LOW, HIGH,  LOW,  LOW},
@@ -188,11 +188,11 @@ void zahrada_krok(int krok) {
       {HIGH,  LOW,  LOW, HIGH}
   };
 
-  const int *HODNOTY = ZAHRADA_KROKY[krok];
-  digitalWrite(OUT_ZAHRADA_MOTOR_1, HODNOTY[0]);
-  digitalWrite(OUT_ZAHRADA_MOTOR_2, HODNOTY[1]);
-  digitalWrite(OUT_ZAHRADA_MOTOR_3, HODNOTY[2]);
-  digitalWrite(OUT_ZAHRADA_MOTOR_4, HODNOTY[3]);
+  const int *hodnoty = zahradaKroky[krok];
+  digitalWrite(OUT_ZAHRADA_MOTOR_1, hodnoty[0]);
+  digitalWrite(OUT_ZAHRADA_MOTOR_2, hodnoty[1]);
+  digitalWrite(OUT_ZAHRADA_MOTOR_3, hodnoty[2]);
+  digitalWrite(OUT_ZAHRADA_MOTOR_4, hodnoty[3]);
 
   delay(ZAHRADA_KROK_PAUZA);
 }

@@ -14,7 +14,9 @@ if not exist %filepath% (
         echo        }
         echo    ],
         echo    "settings": {
-        echo        "arduino.path": "%directorypath%arduino"
+        echo        "arduino.path": "%directorypath%arduino",
+        echo        "arduino.defaultBaudRate": 9600,
+        echo        "C_Cpp.intelliSenseCacheSize": 0
         echo    }
         echo }
     ) > %filepath%
