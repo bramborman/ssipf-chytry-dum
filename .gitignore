@@ -297,7 +297,9 @@ __pycache__/
 
 
 !arduino/*
+arduino/portable/staging/
 arduino/portable/library_index.json
+arduino/portable/package_esp8266com_index.json
 arduino/portable/package_index.json
 arduino/portable/package_index.json.sig
 arduino/portable/preferences.txt

@@ -87,36 +87,37 @@ void loop() {
     Serial.print("Původní hodnota z fotorezistoru: ");
     Serial.println(analogRead(IN_A_FOTOREZISTOR));
 #endif
-    analogoveCidlo_cekatNaHodnotu(IN_A_FOTOREZISTOR, analogRead(IN_A_FOTOREZISTOR) + FOTOREZISTOR_ROZDIL_HODNOT, 10000);
-
+    
+    if (analogoveCidlo_cekatNaHodnotu(IN_A_FOTOREZISTOR, analogRead(IN_A_FOTOREZISTOR) + FOTOREZISTOR_ROZDIL_HODNOT, 10000)) {
 #ifdef SERIAL_DEBUG
-    Serial.println("Zapínám žárovky");
+      Serial.println("Zapínám žárovky");
 #endif
-    digitalWrite(OUT_RELAY_ZAROVKY, HIGH);
+      digitalWrite(OUT_RELAY_ZAROVKY, HIGH);
 
-    // Počkáme, než se žárovky dostatečně nahřejí
-    // Se zvyšující se teplotou, se hodnota vrácená
-    // z termistoru SNIŽUJE
+      // Počkáme, než se žárovky dostatečně nahřejí
+      // Se zvyšující se teplotou, se hodnota vrácená
+      // z termistoru SNIŽUJE
 #ifdef SERIAL_DEBUG
-    Serial.println("Čekám na nahřátí žárovek");
-    Serial.print("Původní hodnota z termistoru: ");
-    Serial.println(analogRead(IN_A_TERMISTOR));
+      Serial.println("Čekám na nahřátí žárovek");
+      Serial.print("Původní hodnota z termistoru: ");
+      Serial.println(analogRead(IN_A_TERMISTOR));
 #endif
-    analogoveCidlo_cekatNaHodnotu(IN_A_TERMISTOR, analogRead(IN_A_TERMISTOR) - TERMISTOR_ROZDIL_NAHRATI);
+      analogoveCidlo_cekatNaHodnotu(IN_A_TERMISTOR, analogRead(IN_A_TERMISTOR) - TERMISTOR_ROZDIL_NAHRATI);
 
-    digitalWrite(OUT_RELAY_ZAROVKY, LOW);
+      digitalWrite(OUT_RELAY_ZAROVKY, LOW);
 #ifdef SERIAL_DEBUG
-    Serial.println("Vypínám žárovky");
-    Serial.println("Zapínám chlazení");
+      Serial.println("Vypínám žárovky");
+      Serial.println("Zapínám chlazení");
 #endif
-    digitalWrite(OUT_RELAY_CHLAZENI, HIGH);
+      digitalWrite(OUT_RELAY_CHLAZENI, HIGH);
 
-    analogoveCidlo_cekatNaHodnotu(IN_A_TERMISTOR, analogRead(IN_A_TERMISTOR) + TERMISTOR_ROZDIL_CHLAZENI);
+      analogoveCidlo_cekatNaHodnotu(IN_A_TERMISTOR, analogRead(IN_A_TERMISTOR) + TERMISTOR_ROZDIL_CHLAZENI);
 
-    digitalWrite(OUT_RELAY_CHLAZENI, LOW);
+      digitalWrite(OUT_RELAY_CHLAZENI, LOW);
 #ifdef SERIAL_DEBUG
-    Serial.println("Vypínám chlazení");
+      Serial.println("Vypínám chlazení");
 #endif
+    }
   }
 
   delay(1000);
@@ -128,7 +129,10 @@ void analogoveCidlo_cekatNaHodnotu(const uint8_t pin, const int hodnota) {
 }
 
 // Čeká, dokud nepřijde z čidla požadovaná hodnota, nebo dokud nevyprší čas
-void analogoveCidlo_cekatNaHodnotu(const uint8_t pin, const int pozadovanaHodnota, const int maxDobaCekani) {
+// Vrací:
+// - true: hodnota z čidla dosáhla požadované hodnoty
+// - false: čas vypršel dříve, než hodnota z čidla dosáhla požadované hodnoty
+bool analogoveCidlo_cekatNaHodnotu(const uint8_t pin, const int pozadovanaHodnota, const int maxDobaCekani) {
   int hodnota = analogRead(pin);
   bool (*porovnavaniHodnot)(const int, const int) = hodnota < pozadovanaHodnota ? _analogoveCidlo_hodnotaMensiNezPozadovana : _analogoveCidlo_hodnotaVetsiNezPozadovana;
   bool (*porovnavaniCasu)(const int) = maxDobaCekani == BEZ_CASOVEHO_OMEZENI ? _analogoveCidlo_neporovnavatCas : _analogoveCidlo_porovnavatCas;
@@ -155,9 +159,12 @@ void analogoveCidlo_cekatNaHodnotu(const uint8_t pin, const int pozadovanaHodnot
     Serial.print("Čas ");
     Serial.print(maxDobaCekani);
     Serial.println("ms vypršel a hodnota z čidla nedosáhla požadované hodnoty");
+
+    return false;
   }
   else {
     Serial.println("Hodnota z čidla dosáhla požadované hodnoty");
+    return true;
   }
 #endif
 }
