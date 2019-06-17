@@ -30,3 +30,24 @@ if not exist %filepath% (
         echo }
     ) > %filepath%
 )
+
+set filepath=%directorypath%.vscode\\c_cpp_properties.json
+
+if not exist %filepath% (
+    (
+        echo {
+        echo    "configurations": [
+        echo        {
+        echo            "name": "Win32",
+        echo            "defines": [
+        echo                "USBCON"
+        echo            ],
+        echo            "includePath": [
+        echo                "%directorypath%arduino\\**"
+        echo            ]
+        echo        }
+        echo    ],
+        echo    "version": 4
+        echo }
+    ) > %filepath%
+)
