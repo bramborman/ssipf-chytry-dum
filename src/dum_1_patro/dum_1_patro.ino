@@ -4,7 +4,7 @@
 // Odkomentujte následující řádek
 // pro zapnutí vypisování testovacích
 // zpráv do sériového monitoru
-#define SERIAL_DEBUG
+// #define SERIAL_DEBUG
 
 // Definice pinů
 #define IN_SALINA 10

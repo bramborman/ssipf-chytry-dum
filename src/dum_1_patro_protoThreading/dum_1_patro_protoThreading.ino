@@ -7,7 +7,7 @@
 // Odkomentujte následující řádek
 // pro zapnutí vypisování testovacích
 // zpráv do sériového monitoru
-#define SERIAL_DEBUG
+// #define SERIAL_DEBUG
 
 // Nastavení adresy I2C (0x27 v mém případě),
 // a dále počtu znaků a řádků LCD, zde 16x2
