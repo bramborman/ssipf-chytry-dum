@@ -1,4 +1,4 @@
-# SŠIPF - Chytrý dům
+# Chytrý dům
 
 Projekt je nakonfigurovaný pro vývoj ve [Visual Studio Code](https://code.visualstudio.com/), které má vůči klasickému Arduino IDE několik výhod, jako doplňování a barevné zvýrazňování kódu, větší přizpůsobitelnost a další...
 
@@ -11,7 +11,7 @@ Projekt je nakonfigurovaný pro vývoj ve [Visual Studio Code](https://code.visu
 
 2) Soubor `nakonfigurovat-prostredi.bat` vytvoří v repozitáři několik lokálních souborů: 
     
-    - `ssipf-chytry-dum.code-workspace`, který lze otevřít ve Visual Studio Code
+    - `chytry-dum.code-workspace`, který lze otevřít ve Visual Studio Code
     
     - `.vscode/arduino.json`, ve kterém je uloženo nastavení "programátora" na `AVRISP mkII`, který je v době psaní tohoto návodu výchozí v Arduino IDE <small><small>(později při používání VS Code s rozšířením pro Arduino se do tohoto souboru uloží více nastavení)</small></small>
     - `.vscode/c_cpp_properties.json`, který obsahuje konfiguraci potřebnou pro správnou funkčnost IntelliSense (automatické doplňování apod.)
